@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import XLSX from "xlsx";
-import { array } from "./array";
-import { Types } from "./excelType";
 import axios from "axios";
 
 class ExcelToJson extends React.Component {
@@ -55,30 +53,15 @@ class ExcelToJson extends React.Component {
       const data = XLSX.utils.sheet_to_json(ws);
       console.log(8910, data);
 
-      /* Update state */
-      // this.setState({ data: data, cols: array(ws["!ref"]) }, () => {
-      //   console.log(JSON.stringify(data, null, 2));
-      // });
-
       data.map(async unique => {
-        const data = await axios.post(
-          "localhost:3000/api/point",
-          {
-            headers: {
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Methods":
-                "GET,PUT,POST,DELETE,PATCH,OPTIONS"
-            }
-          },
-          {
-            x: unique["X"],
-            y: unique["Y"],
-            text: unique["NORMALIZED ADRESS"],
-            brand: unique["MERCHANT"].toLowerCase(),
-            marker:
-              "https://digiventures-whitelabel.s3.amazonaws.com/whitelabel/Columbia/benefit/gotas/Gota+restaurantes-contactless.png"
-          }
-        );
+        const data = await axios.post("http://localhost:3000/api/point", {
+          x: unique["X"],
+          y: unique["Y"],
+          text: unique["NORMALIZED ADDRESS"],
+          brand: unique["MERCHANT"].toLowerCase(),
+          marker:
+            "https://digiventures-whitelabel.s3.amazonaws.com/whitelabel/Columbia/benefit/gotas/Gota+restaurantes-contactless.png"
+        });
         console.log(data);
       });
     };
@@ -90,6 +73,33 @@ class ExcelToJson extends React.Component {
     }
   }
   render() {
+    const Types = [
+      "xlsx",
+      "xlsb",
+      "xlsm",
+      "xls",
+      "xml",
+      "csv",
+      "txt",
+      "ods",
+      "fods",
+      "uos",
+      "sylk",
+      "dif",
+      "dbf",
+      "prn",
+      "qpw",
+      "123",
+      "wb*",
+      "wq*",
+      "html",
+      "htm"
+    ]
+      .map(function (x) {
+        return "." + x;
+      })
+      .join(",");
+
     return (
       <div>
         <h3>Carga de archivo</h3>
@@ -99,16 +109,10 @@ class ExcelToJson extends React.Component {
           className="form-control"
           id="file"
           accept={Types}
-          // onChange={handleChange}
           onChange={this.handleChange.bind(this)}
         />
         <br />
-        <button
-          onClick={this.handleFile.bind(this)}
-          // onClick={handleFile}
-        >
-          MAPA
-        </button>
+        <button onClick={this.handleFile.bind(this)}>MAPA</button>
       </div>
     );
   }
