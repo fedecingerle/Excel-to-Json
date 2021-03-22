@@ -1,3 +1,5 @@
+Excel-to-Json es un proyecto hecho en React.js que convierte cualquier tipo de archivo excel a un json. Ademas tiene integrado un script que mete cada json dentro de MongoDb. En caso de no querer usarlo se puede comentar.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
