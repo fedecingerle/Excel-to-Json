@@ -1,0 +1,57 @@
+.converter{
+  margin: auto;
+  width: 30%;
+
+  p{
+    text-align: center;
+  }
+
+  input[type="file"]{
+    display: none;
+  }
+
+  label{ 
+    font-weight: 600;
+    color: white;
+    background-color: #5226BD;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    transition: all .5s;
+    cursor: pointer;
+    padding: 8px 40px;
+    width: 141px;
+    border-radius: 2px;
+    border: 1px solid #e4e7ea;
+  }
+
+  .button{
+    background-color: #39d58c;
+    padding: 10px 15px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 180px;
+    border: none;
+    margin: auto;
+  }
+
+  .error{
+    color: red;
+  }
+  .success{
+    color: green;
+  }
+
+}
+
+@media(max-width: 600px){
+  .converter { 
+    margin: auto;
+    width: 100%
+  }
+}

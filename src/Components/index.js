@@ -1,30 +1,19 @@
 import React, { useState } from "react";
 import XLSX from "xlsx";
 import axios from "axios";
+import "./style.scss";
 
-class ExcelToJson extends React.Component {
-  // const [file, setFile] = useState({});
-  // const [data, setData] = useState([]);
-  // const [cols, setCols] = useState([]);
+function ExcelToJson() {
+  const [file, setFile] = useState({});
+  const [status, setStatus] = useState("");
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      file: {},
-      data: [],
-      cols: []
-    };
+  function handleChange(e) {
+    const files = e.target.files[0];
+    setFile(files);
   }
 
-  handleChange(e) {
-    const files = e.target.files;
-    console.log(files);
-    // setFile({ file: file[0] });
-    this.setState({ file: files[0] });
-  }
-
-  handleFile() {
-    const { file } = this.state;
+  function handleFile() {
+    // const { file } = this.state;
     /* Boilerplate to set up FileReader */
     const reader = new FileReader();
     const rABS = !!reader.readAsBinaryString;
@@ -38,31 +27,38 @@ class ExcelToJson extends React.Component {
         bookVBA: true
       });
 
-      console.log(123, wb);
-
       /* Get first worksheet */
       //This const only read the first excelSheet
       const wsname = wb.SheetNames[0];
-      console.log(345, wsname);
 
       //This const reads the excelData
       const ws = wb.Sheets[wsname];
-      console.log(567, ws);
 
       /* Converting the data into array object */
       const data = XLSX.utils.sheet_to_json(ws);
-      console.log(8910, data);
+      console.log(data);
 
       data.map(async unique => {
-        const data = await axios.post("http://localhost:3000/api/point", {
-          x: unique["X"],
-          y: unique["Y"],
-          text: unique["NORMALIZED ADDRESS"],
-          brand: unique["MERCHANT"].toLowerCase(),
-          marker:
-            "https://digiventures-whitelabel.s3.amazonaws.com/whitelabel/Columbia/benefit/gotas/Gota+restaurantes-contactless.png"
-        });
-        console.log(data);
+        const response = await axios
+          .post("http://localhost:3000/api/point", {
+            x: unique["X"],
+            y: unique["Y"],
+            text: unique["NORMALIZED ADDRESS"],
+            brand: unique["MERCHANT"].toLowerCase(),
+            marker: unique["MARKER"]
+          })
+          .then(response => {
+            setStatus("success");
+          })
+          .catch(error => {
+            if (error.response) {
+              setStatus(`Error ${error.request.status}. ¡Volvé a intentarlo!`);
+            } else if (error.request) {
+              setStatus(`Error ${error.request.status}. ¡Volvé a intentarlo!`);
+            } else {
+              setStatus("Error. ¡Volvé a intentarlo!");
+            }
+          });
       });
     };
 
@@ -72,50 +68,32 @@ class ExcelToJson extends React.Component {
       reader.readAsArrayBuffer(file);
     }
   }
-  render() {
-    const Types = [
-      "xlsx",
-      "xlsb",
-      "xlsm",
-      "xls",
-      "xml",
-      "csv",
-      "txt",
-      "ods",
-      "fods",
-      "uos",
-      "sylk",
-      "dif",
-      "dbf",
-      "prn",
-      "qpw",
-      "123",
-      "wb*",
-      "wq*",
-      "html",
-      "htm"
-    ]
-      .map(function (x) {
-        return "." + x;
-      })
-      .join(",");
 
-    return (
-      <div>
-        <h3>Carga de archivo</h3>
-        <br />
-        <input
-          type="file"
-          className="form-control"
-          id="file"
-          accept={Types}
-          onChange={this.handleChange.bind(this)}
-        />
-        <br />
-        <button onClick={this.handleFile.bind(this)}>MAPA</button>
-      </div>
-    );
-  }
+  const Types = ["xlsx", "xls"]
+    .map(function (x) {
+      return "." + x;
+    })
+    .join(",");
+
+  const { name } = file;
+
+  return (
+    <div className="converter">
+      <p>Carga de archivo</p>
+      <input type="file" id="file" accept={Types} onChange={handleChange} />
+      <label htmlFor="file">Upload File</label>
+      {name === undefined ? <p>No hay archivo disponible</p> : <p>{name}</p>}
+      <br />
+      <button className="button" onClick={handleFile}>
+        MAPA
+      </button>
+      {status && status == "success" ? (
+        <p className="success">¡Carga exitosa!</p>
+      ) : (
+        <p className="error">{status}</p>
+      )}
+    </div>
+  );
 }
 
 export default ExcelToJson;
